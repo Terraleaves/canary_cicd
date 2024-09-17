@@ -6,7 +6,9 @@ import { CicdStack } from '../lib/cicd-stack';
 const app = new cdk.App();
 new CicdStack(app, 'CicdStack', {
   env: {
-    account: '',
+    account: '325861338157',
     region: 'ap-southeast-2'
   }
 });
+
+app.synth();
