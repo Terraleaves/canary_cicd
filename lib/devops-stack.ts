@@ -9,7 +9,7 @@ export class DevOpsStack extends cdk.Stack {
     super(scope, id, props);
 
     // Create Lambda function
-    const myLambdaFunction = new lambda.Function(this, "HelloWorldFunction", {
+    const canaryFunction = new lambda.Function(this, "DevOpsCanaryFunction", {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "index.handler",
       code: lambda.Code.fromAsset(path.join(__dirname, '../function')),
@@ -17,16 +17,16 @@ export class DevOpsStack extends cdk.Stack {
     });
 
     // Add admin access to do everything
-    myLambdaFunction.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
+    canaryFunction.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
 
     // Create function to output url in console
-    const myLambdaFunctionUrl = myLambdaFunction.addFunctionUrl({
+    const canaryFunctionUrl = canaryFunction.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
     });
 
     // Output URL in console
     new cdk.CfnOutput(this, "myFunctionUrlOutput", {
-      value: myLambdaFunctionUrl.url,
+      value: canaryFunctionUrl.url,
     });
   }
 }
