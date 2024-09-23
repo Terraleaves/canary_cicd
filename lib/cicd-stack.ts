@@ -20,19 +20,19 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep
     });
 
-    // 1. Alpha stage
-    pipeline.addStage(new AlphaStage(this, "Alpha", {
+    // Deploy stage
+    pipeline.addStage(new DeployStage(this, "Deploy", {
       env: {
         account: '325861338157',
         region: 'ap-southeast-2'
       }
     }));
 
-    // Add more stages here
+    // Add more stage
   }
 }
 
-export class AlphaStage extends cdk.Stage {
+export class DeployStage extends cdk.Stage {
   constructor(scope: Construct, id: string, props?: cdk.StageProps) {
     super(scope, id, props);
 
