@@ -20,13 +20,15 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep
     });
 
-    // Alpha stage
-    pipeline.addStage(new AlphaStage(this, "test", {
+    // 1. Alpha stage
+    pipeline.addStage(new AlphaStage(this, "Alpha", {
       env: {
         account: '325861338157',
         region: 'ap-southeast-2'
       }
-    }))
+    }));
+
+    // Add more stages here
   }
 }
 
