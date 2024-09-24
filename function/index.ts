@@ -1,7 +1,7 @@
 import { createCloudWatchDashboard, sendMetricsToCloudWatch } from "./cloudwatch";
 import { getWebsitesFromS3 } from "./s3";
 import { checkWebsiteHealth } from "./websiteHealth";
-import { createSNSTopicAndSendMessage, triggerAlarm } from "./triggerAlarm";
+import { triggerAlarm } from "./triggerAlarm";
 import { logAlarmToDynamoDB } from "./dynamoDB";
 
 // Configuration
@@ -11,9 +11,6 @@ const FILE_KEY = "websites.json";
 
 exports.handler = async function (event: any) {
   try {
-    // 0. Create and attach policy to get permission
-
-
     // 1. Get all website data from JSON file which is stored in S3 bucket
     const websites = await getWebsitesFromS3(BUCKET_NAME, FILE_KEY);
 
