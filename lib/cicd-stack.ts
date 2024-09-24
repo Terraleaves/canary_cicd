@@ -20,12 +20,11 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep
     });
 
-    pipeline.addStage(new TestStage(this, "Staging", {
-      env: {
-        account: '325861338157',
-        region: 'ap-southeast-2'
-      }
-    }));
+    // Unit testing stage
+
+    // Functionality testing stage
+
+    // Integration testing stage
 
     // Deploy stage
     pipeline.addStage(new DeployStage(this, "Deploy", {
@@ -34,18 +33,6 @@ export class CicdStack extends cdk.Stack {
         region: 'ap-southeast-2'
       }
     }));
-
-    // Add more stage
-  }
-}
-
-export class TestStage extends cdk.Stage {
-  constructor(scope: Construct, id: string, props?: cdk.StageProps) {
-    super(scope, id, props);
-
-    new ShellStep('UnitTests', {
-      commands: ['npm run test']
-    });
   }
 }
 
