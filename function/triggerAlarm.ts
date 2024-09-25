@@ -33,7 +33,7 @@ export async function createSNSTopicAndSendMessage(): Promise<any> {
 
     // 4. Check if the email is already subscribed
     const isSubscribed = subscriptions.some(
-      (sub) => sub.Protocol === "email" && sub.Endpoint === email
+      (subscription) => subscription.Protocol === "email" && subscription.Endpoint === email
     );
 
     if (isSubscribed) {
@@ -50,7 +50,6 @@ export async function createSNSTopicAndSendMessage(): Promise<any> {
 
       console.log(`Message sent successfully to topic.`);
     }
-
     if (topicArn) return topicArn;
   } catch (error) {
     console.error("Error creating topic or sending message:", error);
@@ -78,4 +77,5 @@ export async function triggerAlarm(
     },
   };
   await sns.publish(params).promise();
+  console.log("Send message successfully.");
 }

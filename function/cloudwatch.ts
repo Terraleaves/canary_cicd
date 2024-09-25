@@ -1,12 +1,15 @@
 import { CloudWatch } from "aws-sdk";
 import { checkWebsiteHealth } from "./websiteHealth";
+const AWS = require("aws-sdk");
 
+
+AWS.config.update({ region: 'ap-southeast-2'})
 interface Website {
   url: string;
   name: string;
 }
 
-const cloudWatch = new CloudWatch();
+const cloudWatch = new CloudWatch({region: 'ap-southeast-2'});
 const DASHBOARD_NAME = "DebOpsKiyo";
 const NAMESPACE = "WebsiteHealth";
 

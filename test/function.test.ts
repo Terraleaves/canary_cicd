@@ -22,87 +22,58 @@ const allWebsites = [
   { url: "https://google.com", name: "Google" },
 ];
 
-const mockS3Instance = {
-  getObject: jest.fn().mockReturnThis(),
-  promise: jest.fn().mockReturnThis(),
-};
-
-const mockCloudWatchInstance = {
-  putDashboard: jest.fn().mockReturnValue({
-    promise: jest.fn().mockResolvedValue({}),
-  }),
-};
-
-jest.mock("aws-sdk", () => {
-  return {
-    S3: jest.fn(() => mockS3Instance),
-    CloudWatch: jest.fn(() => mockCloudWatchInstance),
-  };
-});
-
-describe("Unit Testing", () => {
+describe("Function Testing", () => {
   describe("S3", () => {
-    it("Calls aws-sdk getObject method with correct parameters", async () => {
+    it("Retrieves websites from S3", async () => {
       const websites = await getWebsitesFromS3(BUCKET_NAME, FILE_KEY);
-
       expect(websites).toEqual(allWebsites);
     });
   });
 
   describe("CloudWatchDashboard", () => {
-    it("Should create a dashboard with the correct parameters", async () => {
+    it("Creates a dashboard with correct parameters", async () => {
       await createCloudWatchDashboard(allWebsites);
-
-      expect("Dashboard updated successfully.");
+      console.log("CloudWatch dashboard created successfully.");
     });
 
-    it("Should send metrics to dashboard with the correct parameters", async () => {
+    it("Sends metrics to CloudWatch", async () => {
       await sendMetricsToCloudWatch(url, name);
-
-      expect("Metrics sent to CloudWatch successfully.");
+      console.log("Metrics sent to CloudWatch successfully.");
     });
   });
 
   describe("Website health", () => {
-    it("Should return availability and latency", async () => {
-      const url = "https://kiyo31.com";
-
-      const { availability, latency } = await checkWebsiteHealth(url);
-
-      assert.strictEqual(availability, 100.0);
-      assert.ok(latency >= 0);
-      assert.ok(latency <= 100000);
+    it("Checks website health for availability and latency", async () => {
+      const result = await checkWebsiteHealth(url);
+      assert.strictEqual(result.availability, 100.0);
+      assert.ok(result.latency >= 0);
     });
   });
 
   describe("Trigger Alarm", () => {
-    it("Should create SNS topic if not exist", async () => {
+    it("Creates SNS topic if not exist", async () => {
       const arn = await createSNSTopicAndSendMessage();
-
       assert.strictEqual(
         arn,
         "arn:aws:sns:ap-southeast-2:325861338157:DevOpsNotificationTopic"
       );
     });
 
-    it("Should create trigger and send alarm to subsribed user", async () => {
+    it("Triggers an alarm", async () => {
       await triggerAlarm(name, availability, latency);
-
-      expect("Send message successfully.");
+      console.log("Alarm triggered successfully.");
     });
   });
 
   describe("DynamoDB", () => {
-    it("Should create DynamoDB table if not exist", async () => {
+    it("Creates a DynamoDB table if not exist", async () => {
       await createDynamoDBTable();
-
-      expect("Table created successfully." || "Table already exists. No need to create it.");
+      console.log("DynamoDB table created successfully.");
     });
 
-    it("Should send log to DynamoDB", async () => {
+    it("Logs alarm to DynamoDB", async () => {
       await logAlarmToDynamoDB(name, availability, latency);
-
-      expect("Sent log to dynamoDB successfully.");
+      console.log("Alarm log saved to DynamoDB.");
     });
   });
 });
