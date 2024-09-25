@@ -1,7 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
+import { CodePipeline, CodePipelineSource, ShellStep, ManualApprovalStep } from 'aws-cdk-lib/pipelines';
 import { DevOpsStack } from './devops-stack';
+import { MyPipelineAppStage } from './pipeline-app-stage';
 
 export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,26 +21,25 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep
     });
 
-    // Unit testing stage
+    const testStep = new ShellStep('Test', {
+      input: synthStep,  // Use the output of the synth step
+      commands: ['npm test'],  // Run your tests
+    });
 
-    // Functionality testing stage
-
-    // Integration testing stage
 
     // Deploy stage
-    pipeline.addStage(new DeployStage(this, "Deploy", {
+    const deployStage = pipeline.addStage(new MyPipelineAppStage(this, "Deploy", {
       env: {
         account: '325861338157',
         region: 'ap-southeast-2'
       }
     }));
+
+    deployStage.addPre(testStep);
+
+    deployStage.addPre(new ManualApprovalStep('approval'));
+
   }
 }
 
-export class DeployStage extends cdk.Stage {
-  constructor(scope: Construct, id: string, props?: cdk.StageProps) {
-    super(scope, id, props);
 
-    const devopsStack = new DevOpsStack(this, 'DevOpsStack');
-  }
-}
