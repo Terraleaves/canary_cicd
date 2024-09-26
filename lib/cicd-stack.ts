@@ -41,8 +41,8 @@ export class CicdStack extends cdk.Stack {
       })
     );
 
-    deployStage.addPre(new ShellStep("RunTests", {
-      commands: ["npm ci", "npm test"],
+    deployStage.addPre(new ShellStep("Tes", {
+      commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"],
     }));
 
     deployStage.addPost(new ManualApprovalStep("approval"));
