@@ -45,7 +45,7 @@ export class CicdStack extends cdk.Stack {
       commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"]
     }));
 
-    deployStage.addPost(new ManualApprovalStep("approval"));
+    deployStage.addPre(new ManualApprovalStep("approval"));
 
     // const wave = pipeline.addWave('wave');
     // wave.addStage(new MyPipelineAppStage(this, 'AppEU', {
