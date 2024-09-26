@@ -22,7 +22,7 @@ export class CicdStack extends cdk.Stack {
             "arn:aws:codestar-connections:us-east-2:325861338157:connection/dc5275a2-85db-48f1-91e2-a1aac8496373",
         }
       ),
-      commands: ["npm ci", "npm run build", "npx cdk synth", "npm test"],
+      commands: ["npm ci", "npm run build", "npx cdk synth", "node --max-old-space-size=4096 node_modules/.bin/jest"],
       primaryOutputDirectory: "cdk.out",
     });
 
