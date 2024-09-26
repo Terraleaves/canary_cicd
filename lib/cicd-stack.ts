@@ -13,6 +13,13 @@ export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    new iam.Role(this, 'AdminRole', {
+      assumedBy: new iam.AnyPrincipal(), // This is for CloudWatch Logs
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')
+      ]
+    });
+
     const synthStep = new ShellStep("Synth", {
       input: CodePipelineSource.connection(
         "kiyohiro0310/devops_cicd",
@@ -30,12 +37,6 @@ export class CicdStack extends cdk.Stack {
       pipelineName: "DevOpsPipeline",
       synth: synthStep,
     });
-
-    const buildRole = pipeline.pipeline.role;
-
-    buildRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')
-    );
 
     // Deploy stage
     const deployStage = pipeline.addStage(
