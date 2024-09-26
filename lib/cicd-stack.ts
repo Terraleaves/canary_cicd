@@ -13,13 +13,6 @@ export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new iam.Role(this, 'AdminRole', {
-      assumedBy: new iam.AnyPrincipal(), // This is for CloudWatch Logs
-      managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')
-      ]
-    });
-
     const synthStep = new ShellStep("Synth", {
       input: CodePipelineSource.connection(
         "kiyohiro0310/devops_cicd",
@@ -29,7 +22,7 @@ export class CicdStack extends cdk.Stack {
             "arn:aws:codestar-connections:us-east-2:325861338157:connection/dc5275a2-85db-48f1-91e2-a1aac8496373",
         }
       ),
-      commands: ["npm ci", "npm run build", "npx cdk synth"],
+      commands: ["npm ci", "npm run build", "npx cdk synth", "npm test"],
       primaryOutputDirectory: "cdk.out",
     });
 
@@ -48,12 +41,8 @@ export class CicdStack extends cdk.Stack {
       })
     );
 
-    deployStage.addPre(new ShellStep("Test", {
-      commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"],
-    }));
 
-
-    deployStage.addPost(new ManualApprovalStep("approval"));
+    deployStage.addPre(new ManualApprovalStep("approval"));
 
     // const wave = pipeline.addWave('wave');
     // wave.addStage(new MyPipelineAppStage(this, 'AppEU', {
