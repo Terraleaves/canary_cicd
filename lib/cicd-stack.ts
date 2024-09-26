@@ -7,7 +7,7 @@ import {
   ManualApprovalStep,
 } from "aws-cdk-lib/pipelines";
 import { MyPipelineAppStage } from "./pipeline-app-stage";
-import { ComputeType } from "aws-cdk-lib/aws-codebuild";
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -31,6 +31,10 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep,
     });
 
+    pipeline.pipeline.role.addManagedPolicy(
+      iam.ManagedPolicy.fromManagedPolicyName(this, "arn:aws:iam::aws:policy/AdministratorAccess", "AdministratorAccess")
+    );
+
     // Deploy stage
     const deployStage = pipeline.addStage(
       new MyPipelineAppStage(this, "Deploy", {
@@ -44,6 +48,7 @@ export class CicdStack extends cdk.Stack {
     deployStage.addPre(new ShellStep("Tes", {
       commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"],
     }));
+
 
     deployStage.addPost(new ManualApprovalStep("approval"));
 
