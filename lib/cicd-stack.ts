@@ -31,8 +31,10 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep,
     });
 
-    pipeline.pipeline.role.addManagedPolicy(
-      iam.ManagedPolicy.fromManagedPolicyName(this, "arn:aws:iam::aws:policy/AdministratorAccess", "AdministratorAccess")
+    const buildRole = pipeline.pipeline.role;
+
+    buildRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')
     );
 
     // Deploy stage
@@ -45,7 +47,7 @@ export class CicdStack extends cdk.Stack {
       })
     );
 
-    deployStage.addPre(new ShellStep("Tes", {
+    deployStage.addPre(new ShellStep("Test", {
       commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"],
     }));
 
