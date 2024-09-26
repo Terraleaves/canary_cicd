@@ -6,12 +6,14 @@ export class TestStage extends cdk.Stage {
     constructor(scope: Construct, id: string, props?: cdk.StageProps) {
       super(scope, id, props);
 
+      new cdk.Stack(this, 'TestStack');
+
       // Test step - runs npm test before deployment
-      const testStep = new ShellStep('RunTests', {
+      new ShellStep('RunTests', {
         commands: [
-          'npm ci',    // Ensure dependencies are installed
-          'npm run build',  // (Optional) Build your project
-          'npm test'   // Run your test command
+          'npm ci',
+          'npm run build',
+          'npm test'
         ]
       });
     }
