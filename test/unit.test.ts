@@ -22,23 +22,6 @@ const allWebsites = [
   { url: "https://google.com", name: "Google" },
 ];
 
-const mockS3Instance = {
-  getObject: jest.fn().mockReturnThis(),
-  promise: jest.fn().mockReturnThis(),
-};
-
-const mockCloudWatchInstance = {
-  putDashboard: jest.fn().mockReturnValue({
-    promise: jest.fn().mockResolvedValue({}),
-  }),
-};
-
-jest.mock("aws-sdk", () => {
-  return {
-    S3: jest.fn(() => mockS3Instance),
-    CloudWatch: jest.fn(() => mockCloudWatchInstance),
-  };
-});
 
 describe("Unit Testing", () => {
   describe("S3", () => {
