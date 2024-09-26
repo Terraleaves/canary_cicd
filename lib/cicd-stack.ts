@@ -7,7 +7,6 @@ import {
   ManualApprovalStep,
 } from "aws-cdk-lib/pipelines";
 import { MyPipelineAppStage } from "./pipeline-app-stage";
-import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -31,14 +30,6 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep,
     });
 
-    const testStage = pipeline.addStage(new TestStage(this, 'Test', {
-      env: {
-        account: "325861338157",
-        region: "ap-southeast-2",
-      },
-    }));
-
-    testStage.addPost(new ManualApprovalStep("approval"));
 
     // Deploy stage
     const deployStage = pipeline.addStage(
@@ -50,6 +41,12 @@ export class CicdStack extends cdk.Stack {
       })
     );
 
+    deployStage.addPre(new ShellStep('Test', {
+      commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"]
+    }));
+
+    deployStage.addPost(new ManualApprovalStep("approval"));
+
     // const wave = pipeline.addWave('wave');
     // wave.addStage(new MyPipelineAppStage(this, 'AppEU', {
     //   env: { account: '325861338157', region: 'eu-west-1' }
@@ -57,29 +54,5 @@ export class CicdStack extends cdk.Stack {
     // wave.addStage(new MyPipelineAppStage(this, 'AppUS', {
     //   env: { account: '325861338157', region: 'us-west-1' }
     // }));
-  }
-}
-
-// Define your test stage
-class TestStage extends cdk.Stage {
-  constructor(scope: Construct, id: string, props?: cdk.StageProps) {
-    super(scope, id, props);
-
-    new ShellStep('Test', {
-      commands: ['npm ci', 'node --max-old-space-size=4096 node_modules/.bin/jest'],
-    });
-
-    new MyTestStack(this, 'MyTestStack', {
-      env: {
-        account: '325861338157',
-        region: 'ap-southeast-2',
-      },
-    });
-  }
-}
-
-class MyTestStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
   }
 }
