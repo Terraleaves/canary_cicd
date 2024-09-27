@@ -11,6 +11,7 @@ const FILE_KEY = "websites.json";
 
 exports.handler = async function (event: any) {
   try {
+    console.log("Funciton creating...");
     // 1. Get all website data from JSON file which is stored in S3 bucket
     const websites = await getWebsitesFromS3(BUCKET_NAME, FILE_KEY);
 
