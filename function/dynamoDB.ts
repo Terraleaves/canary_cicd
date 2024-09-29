@@ -47,7 +47,7 @@ export async function logAlarmToDynamoDB(
   availability: number,
   latency: number
 ) {
-  const dynamoDb = new DynamoDB.DocumentClient();
+  const dynamoDb = new DynamoDB.DocumentClient({ region: "ap-southeast-2"});
   const AVAILABILITY_THRESHOLD = 99.0;
   const DYNAMODB_TABLE_NAME = "DevOpsAlarmLog";
 

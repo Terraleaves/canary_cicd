@@ -3,7 +3,7 @@ import { SNS } from "aws-sdk";
 const AVAILABILITY_THRESHOLD = 99.0;
 // const SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:325861338157:demo-ccp";
 
-const sns = new SNS();
+const sns = new SNS({region: "ap-southeast-2"});
 
 // Create SNS
 export async function createSNSTopicAndSendMessage(): Promise<any> {
@@ -51,6 +51,7 @@ export async function createSNSTopicAndSendMessage(): Promise<any> {
       console.log(`Message sent successfully to topic.`);
     }
     if (topicArn) return topicArn;
+
   } catch (error) {
     console.error("Error creating topic or sending message:", error);
   }

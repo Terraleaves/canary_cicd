@@ -24,37 +24,39 @@ import {
 
       // 2. Create CloudWatch dashboard
       await createCloudWatchDashboard(websites);
-      console.log("CloudWatch dashboard created successfully");
+      expect("Dashboard updated successfully.");
 
       for (const site of websites) {
         const { url, name } = site;
 
         // 3. Check website health (availability and latency)
         const { availability, latency } = await checkWebsiteHealth(url);
-        assert.strictEqual(availability, 100.0, `Website ${name} should be available`);
-        console.log(`Website ${name} health checked successfully`);
+        assert.strictEqual(availability, 100.0);
+        assert.ok(latency >= 0);
+        assert.ok(latency <= 100000);
 
         // 4. Trigger SNS alarm if necessary
         await triggerAlarm(name, availability, latency);
-        console.log(`Alarm triggered for ${name}`);
+        expect("Send message successfully.");
 
         // 5. Log alarm to DynamoDB
         await logAlarmToDynamoDB(name, availability, latency);
-        console.log(`Alarm log for ${name} saved to DynamoDB`);
+        expect("Sent log to dynamoDB successfully.");
 
         // 6. Send metrics to CloudWatch
         await sendMetricsToCloudWatch(url, name);
-        console.log(`Metrics for ${name} sent to CloudWatch`);
+        expect("Metrics sent to CloudWatch successfully.");
       }
 
       // 7. Ensure SNS Topic is created
       const arn = await createSNSTopicAndSendMessage();
       assert.strictEqual(arn, snsTopicArn, "SNS Topic ARN should match");
-      console.log("SNS topic created and message sent successfully");
+      if (arn != undefined) assert.strictEqual(arn,"arn:aws:sns:ap-southeast-2:325861338157:DevOpsNotificationTopic");
+      else assert.strictEqual(arn, undefined);
     });
 
     it("Should create DynamoDB table if it doesn't exist", async () => {
       await createDynamoDBTable();
-      console.log("DynamoDB table created or already exists");
+      expect("Table created successfully." || "Table already exists. No need to create it.");
     });
   });

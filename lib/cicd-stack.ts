@@ -42,17 +42,9 @@ export class CicdStack extends cdk.Stack {
     );
 
     deployStage.addPre(new ShellStep('Test', {
-      commands: ["npm ci", "node --max-old-space-size=4096 node_modules/.bin/jest"]
+      commands: ["npm install", "node --max-old-space-size=4096 node_modules/.bin/jest"]
     }));
 
     deployStage.addPre(new ManualApprovalStep("approval"));
-
-    // const wave = pipeline.addWave('wave');
-    // wave.addStage(new MyPipelineAppStage(this, 'AppEU', {
-    //   env: { account: '325861338157', region: 'eu-west-1' }
-    // }));
-    // wave.addStage(new MyPipelineAppStage(this, 'AppUS', {
-    //   env: { account: '325861338157', region: 'us-west-1' }
-    // }));
   }
 }

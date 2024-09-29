@@ -20,6 +20,7 @@ const latency = 1500;
 const allWebsites = [
   { url: "https://kiyo31.com", name: "Kiyohiro Kambayashi" },
   { url: "https://google.com", name: "Google" },
+  { url: "https://www.youtube.com/", name: "YouTube"}
 ];
 
 
