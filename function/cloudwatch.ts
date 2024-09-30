@@ -1,6 +1,5 @@
 import { CloudWatch } from "aws-sdk";
 import { checkWebsiteHealth } from "./websiteHealth";
-const AWS = require("aws-sdk");
 
 interface Website {
   url: string;

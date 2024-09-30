@@ -30,7 +30,26 @@ export class CicdStack extends cdk.Stack {
       synth: synthStep,
     });
 
+    // UAT stage
+    const uatStage = pipeline.addStage(
+      new MyPipelineAppStage(this, "UAT", {
+        env: {
+          account: "325861338157",
+          region: "ap-southeast-2",
+        },
+      })
+    );
 
+    uatStage.addPre(
+      new ShellStep("Test", {
+        commands: [
+          "npm ci",
+          "node --max-old-space-size=4096 node_modules/.bin/jest",
+        ],
+      })
+    );
+
+    uatStage.addPost(new ManualApprovalStep("approval"));
 
     const deployStage = pipeline.addStage(
       new MyPipelineAppStage(this, "Deploy", {
@@ -40,16 +59,5 @@ export class CicdStack extends cdk.Stack {
         },
       })
     );
-
-    deployStage.addPre(
-      new ShellStep("Test", {
-        commands: [
-          "npm ci",
-          "node --max-old-space-size=4096 node_modules/.bin/jest",
-        ],
-      })
-    );
-
-    deployStage.addPre(new ManualApprovalStep("approval"));
   }
 }
