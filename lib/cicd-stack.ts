@@ -32,7 +32,7 @@ export class CicdStack extends cdk.Stack {
 
     // UAT stage
     const uatStage = pipeline.addStage(
-      new MyPipelineAppStage(this, "STAGE", {
+      new MyPipelineAppStage(this, "Stage", {
         env: {
           account: "325861338157",
           region: "ap-southeast-2",
@@ -52,7 +52,7 @@ export class CicdStack extends cdk.Stack {
     uatStage.addPost(new ManualApprovalStep("approval"));
 
     const deployStage = pipeline.addStage(
-      new MyPipelineAppStage(this, "DEPLOY", {
+      new MyPipelineAppStage(this, "Deploy", {
         env: {
           account: "325861338157",
           region: "ap-southeast-2",

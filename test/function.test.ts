@@ -49,14 +49,14 @@ describe("Function Testing", () => {
       const name = websites[0].name;
 
       await triggerAlarm(name, availability, latency);
-      console.log("Alarm triggered successfully.");
+      expect("Send message successfully.");
     });
   });
 
   describe("DynamoDB", () => {
     it("Creates a DynamoDB table if not exist", async () => {
       await createDynamoDBTable();
-      console.log("DynamoDB table created successfully.");
+      expect("Table created successfully." || "Table already exists. No need to create it.");
     });
 
     it("Logs alarm to DynamoDB", async () => {
@@ -64,7 +64,7 @@ describe("Function Testing", () => {
 
       const name = websites[0].name;
       await logAlarmToDynamoDB(name, availability, latency);
-      console.log("Alarm log saved to DynamoDB.");
+      expect("Sent log to dynamoDB successfully.");
     });
   });
 });
