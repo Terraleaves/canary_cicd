@@ -56,11 +56,11 @@ describe("Integration Testing", () => {
 
       // Create DyanamoDB Table if not exist
       await createDynamoDBTable();
-      console.log("Table created successfully." || "Table already existNo need to create it.");
+      console.log("Table created successfully." || "Table already exist. No need to create it.");
 
       // Log alarm to DynamoDB
       await logAlarmToDynamoDB(name, availability, latency);
-      expect("Sent log to dynamoDB successfully.");
+      console.log("Sent log to dynamoDB successfully.");
     }
   }, 30000);
 

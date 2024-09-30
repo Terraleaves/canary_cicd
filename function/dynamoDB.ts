@@ -1,15 +1,21 @@
 import { DynamoDB } from "aws-sdk";
-import { CreateTableCommand, DescribeTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import {
+  CreateTableCommand,
+  DescribeTableCommand,
+  DynamoDBClient,
+  waitUntilTableExists,
+} from "@aws-sdk/client-dynamodb";
 
 export async function createDynamoDBTable() {
-  const client = new DynamoDBClient({ region: "ap-southeast-2"});
+  const client = new DynamoDBClient({ region: "ap-southeast-2" });
 
   try {
     // Check if the table exists
-    const describeTableCommand = new DescribeTableCommand({ TableName: "DevOpsAlarmLog" });
+    const describeTableCommand = new DescribeTableCommand({
+      TableName: "DevOpsAlarmLog",
+    });
     await client.send(describeTableCommand);
     console.log(`Table already exists. No need to create it.`);
-
   } catch (error: any) {
     // If the table does not exist, create it
     if (error.name === "ResourceNotFoundException") {
@@ -31,14 +37,22 @@ export async function createDynamoDBTable() {
       });
 
       await client.send(command);
+
+      // Wait until the table is ACTIVE
+      await waitUntilTableExists(
+        {
+          client,
+          maxWaitTime: 300,
+        },
+        { TableName: "DevOpsAlarmLog" }
+      );
+
       console.log("Table created successfully.");
-    }
-    else {
+    } else {
       console.error("An error occurred while checking the table:", error);
       throw error;
-
+    }
   }
-}
 }
 
 // Create function to add alarm to dynamoDB
@@ -48,14 +62,15 @@ export async function logAlarmToDynamoDB(
   latency: number
 ) {
   // Define DynamoDB client with region
-  const dynamoDb = new DynamoDB.DocumentClient({ region: "ap-southeast-2"});
+  const dynamoDb = new DynamoDB.DocumentClient({ region: "ap-southeast-2" });
 
   // Set condition of availiabity
   const AVAILABILITY_THRESHOLD = 99.0;
   const DYNAMODB_TABLE_NAME = "DevOpsAlarmLog";
 
   // If availability is under condition, define metric type is availability to be stored in database table
-  const metricType = availability < AVAILABILITY_THRESHOLD ? "Availability" : "Latency";
+  const metricType =
+    availability < AVAILABILITY_THRESHOLD ? "Availability" : "Latency";
 
   // Parameters to add data
   const params = {
