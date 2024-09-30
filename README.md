@@ -1,14 +1,26 @@
-# Welcome to your CDK TypeScript project
+# COMP2029 DevOps CICD project
+This repository include mainly 2 features:
+1. Lambda function
+   - Obtaining metrics(Availability, latency) for 3 URLs
+   - Creating a monitoring service to monitor the metrics
+   - Creating alarms on metrics
+   - Send notification of each websites metrics
+   - Create DynamoDB table and store alarm information
+2. Set up CICD pipeline
+    - Source
+    - Build
+    - Update Pipeline
+    - Assets
+    - Stage
+    - Deploy
 
-This is a blank project for CDK development with TypeScript.
-
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+## Run app
+Make sure you have created repository using aws cdk before pull this repository.
+Once you've got repository, take following steps to run app
+```
+npm install
+npm run build
+cdk bootstrap (You might need to configure your account)
+cdk synth
+cdk deploy
+```

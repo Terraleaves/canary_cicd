@@ -36,7 +36,7 @@ export class CicdStack extends cdk.Stack {
 
     // UAT stage
     const uatStage = pipeline.addStage(
-      new MyPipelineAppStage(this, "UAT", {
+      new MyPipelineAppStage(this, "Stage", {
         env: {
           account: "325861338157",
           region: "ap-southeast-2",
