@@ -21,7 +21,7 @@ export class CicdStack extends cdk.Stack {
             "arn:aws:codestar-connections:us-east-2:325861338157:connection/dc5275a2-85db-48f1-91e2-a1aac8496373",
         }
       ),
-      commands: ["npm ci", "npm run build", "npx cdk synth"],
+      commands: ["cd function", "npm ci", "cd ..", "npm ci", "npm run build", "npx cdk synth"],
       primaryOutputDirectory: "cdk.out",
     });
 
