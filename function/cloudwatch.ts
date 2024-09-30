@@ -30,19 +30,19 @@ export async function createCloudWatchDashboard(
           "Availability",
           "WebsiteName",
           site.name,
-          { yAxis: "left" }, // Specify left y-axis for Availability
+          { yAxis: "left" },
         ],
         [
           NAMESPACE,
           "Latency",
           "WebsiteName",
           site.name,
-          { yAxis: "right" }, // Specify right y-axis for Latency
+          { yAxis: "right" },
         ],
       ],
       view: "timeSeries",
       stacked: false,
-      region: "ap-southeast-2", // Replace with your AWS region
+      region: "ap-southeast-2",
       title: `Website Health - ${site.name}`,
       period: 300,
       stat: "Average",
@@ -93,6 +93,7 @@ export async function sendMetricsToCloudWatch(
 ): Promise<void> {
   const { availability, latency } = await checkWebsiteHealth(url);
 
+  // Define parameters
   const params = {
     Namespace: NAMESPACE,
     MetricData: [
@@ -122,6 +123,7 @@ export async function sendMetricsToCloudWatch(
   };
 
   try {
+    //Send metric data to CloudWatch dashboard
     await cloudWatch.putMetricData(params).promise();
     console.log("Metrics sent to CloudWatch successfully.");
   } catch (error) {

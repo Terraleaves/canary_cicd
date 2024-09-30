@@ -4,7 +4,7 @@ const AVAILABILITY_THRESHOLD = 99.0;
 
 const sns = new SNS({region: "ap-southeast-2"});
 
-// Create SNS
+// Create SNS and return arn value
 export async function createSNSTopicAndSendMessage(): Promise<any> {
   try {
     // 1: Create an SNS topic
@@ -38,6 +38,8 @@ export async function createSNSTopicAndSendMessage(): Promise<any> {
     } else {
       // 5. If not subscribed, create a new email subscription
       const subscribeResponse = await sns.subscribe(subscribeParams).promise();
+
+      // Checing subscription has been done
       console.log(
         `Subscription request sent. Subscription ARN: ${subscribeResponse.SubscriptionArn}`
       );
@@ -62,6 +64,7 @@ export async function triggerAlarm(
 ) {
   const message = `Website Health Alert of ${siteName} Availability: ${availability}% Latency: ${latency}ms`;
 
+  // Get arn
   const arn = await createSNSTopicAndSendMessage();
   const params = {
     Message: message,
