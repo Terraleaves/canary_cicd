@@ -1,7 +1,6 @@
 import { SNS } from "aws-sdk";
 
 const AVAILABILITY_THRESHOLD = 99.0;
-// const SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:325861338157:demo-ccp";
 
 const sns = new SNS({region: "ap-southeast-2"});
 
@@ -14,15 +13,13 @@ export async function createSNSTopicAndSendMessage(): Promise<any> {
       .createTopic({ Name: topicName })
       .promise();
     const topicArn = createTopicResponse.TopicArn;
-    const email = "kiyohiro.0310@gmail.com"; // Email address to subscribe
-
-    console.log(`SNS Topic ARN: ${topicArn}`);
+    const email = "kiyohiro.0310@gmail.com";
 
     // 2: Subscribe the email to the topic
     const subscribeParams = {
-      Protocol: "email", // Protocol for email
+      Protocol: "email",
       TopicArn: topicArn!,
-      Endpoint: email, // Email address to subscribe
+      Endpoint: email,
     };
 
     // 3. Add subscriobe to topic
@@ -77,6 +74,8 @@ export async function triggerAlarm(
       },
     },
   };
+
+  // Send message to all subscribed email
   await sns.publish(params).promise();
   console.log("Send message successfully.");
 }
