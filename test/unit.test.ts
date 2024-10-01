@@ -81,7 +81,7 @@ describe("Unit Testing", () => {
       await createDynamoDBTable();
 
       expect("Table created successfully." || "Table already exists. No need to create it.");
-    });
+    }, 300);
 
     it("Should send log to DynamoDB", async () => {
       await logAlarmToDynamoDB(name, availability, latency);
