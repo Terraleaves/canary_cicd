@@ -57,7 +57,7 @@ describe("Function Testing", () => {
     it("Creates a DynamoDB table if not exist", async () => {
       await createDynamoDBTable();
       expect("Table created successfully." || "Table already exists. No need to create it.");
-    });
+    }, 300);
 
     it("Logs alarm to DynamoDB", async () => {
       const websites = await getWebsitesFromS3(BUCKET_NAME, FILE_KEY);
