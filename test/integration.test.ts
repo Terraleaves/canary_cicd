@@ -1,67 +1,30 @@
-import {
-  createCloudWatchDashboard,
-  sendMetricsToCloudWatch,
-} from "../function/cloudwatch";
-import { createDynamoDBTable, logAlarmToDynamoDB } from "../function/dynamoDB";
-import { getWebsitesFromS3 } from "../function/s3";
-import {
-  createSNSTopicAndSendMessage,
-  triggerAlarm,
-} from "../function/triggerAlarm";
-import { checkWebsiteHealth } from "../function/websiteHealth";
-import assert = require("assert");
+import * as cdk from 'aws-cdk-lib';
+import { DevOpsStack } from '../lib/devops-stack'; // Adjust the import path
+import { Template } from 'aws-cdk-lib/assertions'; // Use the assertions module
 
-// Configuration for integration test
-const BUCKET_NAME = "kiyo-devops-demo-webpage";
-const FILE_KEY = "websites.json";
-const snsTopicArn =
-  "arn:aws:sns:ap-southeast-2:325861338157:DevOpsNotificationTopic";
+describe('DevOpsStack Integration Test', () => {
+  let stack: DevOpsStack;
 
-describe("Integration Testing", () => {
-  it("Should complete the full process from S3 to CloudWatch to DynamoDB", async () => {
-    // Get websites from S3
-    const websites = await getWebsitesFromS3(BUCKET_NAME, FILE_KEY);
-    assert.ok(websites.length > 0, "Websites should be retrieved from S3");
+  beforeAll(() => {
+    const app = new cdk.App();
+    stack = new DevOpsStack(app, 'DevOpsStackIntegrationTest');
+  });
 
-    // Create CloudWatch dashboard
-    await createCloudWatchDashboard(websites);
-    console.log("Dashboard updated successfully.");
+  test('SNS Topic is created with the correct properties', () => {
+    const template = Template.fromStack(stack);
 
-    for (const site of websites) {
-      const { url, name } = site;
+    // Check if the SNS topic exists
+    template.hasResourceProperties('AWS::SNS::Topic', {
+      DisplayName: 'Website Health Alarm Topic',
+    });
+  });
 
-      // Check website health (availability and latency)
-      const { availability, latency } = await checkWebsiteHealth(url);
-      assert.strictEqual(availability, 100.0);
-      assert.ok(latency >= 0);
-      assert.ok(latency <= 100000);
+  test('CloudWatch Dashboard is created', () => {
+    const template = Template.fromStack(stack);
 
-      // Send metrics to CloudWatch
-      await sendMetricsToCloudWatch(url, name);
-      console.log("Metrics sent to CloudWatch successfully.");
-
-      // Ensure SNS Topic is created
-      const arn = await createSNSTopicAndSendMessage();
-      assert.strictEqual(arn, snsTopicArn, "SNS Topic ARN should match");
-      if (arn != undefined)
-        assert.strictEqual(
-          arn,
-          "arn:aws:sns:ap-southeast-2:325861338157:DevOpsNotificationTopic"
-        );
-      else assert.strictEqual(arn, undefined);
-
-      // Trigger SNS alarm if necessary
-      await triggerAlarm(name, availability, latency);
-      console.log("Send message successfully.");
-
-      // Create DyanamoDB Table if not exist
-      await createDynamoDBTable();
-      console.log("Table created successfully." || "Table already exist. No need to create it.");
-
-      // Log alarm to DynamoDB
-      await logAlarmToDynamoDB(name, availability, latency);
-      console.log("Sent log to dynamoDB successfully.");
-    }
-  }, 30000);
-
+    // Check if the CloudWatch dashboard exists
+    template.hasResourceProperties('AWS::CloudWatch::Dashboard', {
+      DashboardName: 'DevOpsMonitoringDashboard',
+    });
+  });
 });

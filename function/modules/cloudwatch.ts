@@ -1,5 +1,4 @@
 import { CloudWatch } from "aws-sdk";
-import { checkWebsiteHealth } from "./websiteHealth";
 
 interface Website {
   url: string;
@@ -7,11 +6,11 @@ interface Website {
 }
 
 const cloudWatch = new CloudWatch({region: 'ap-southeast-2'});
-const DASHBOARD_NAME = "DebOpsKiyo";
+const DASHBOARD_NAME = process.env.CW_DASHBOARD_NAME!;
 const NAMESPACE = "WebsiteHealth";
 
 // Create dashboard
-export async function createCloudWatchDashboard(
+export async function updateCWDashboardWithMetrics(
   websites: Website[]
 ): Promise<void> {
 
@@ -88,10 +87,10 @@ export async function createCloudWatchDashboard(
 
 // Send data immediately when cloudwatch dashboard is created
 export async function sendMetricsToCloudWatch(
-  url: string,
-  websiteName: string
+  websiteName: string,
+  availability: number,
+  latency: number
 ): Promise<void> {
-  const { availability, latency } = await checkWebsiteHealth(url);
 
   // Define parameters
   const params = {

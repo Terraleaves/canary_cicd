@@ -5,6 +5,8 @@ interface Website {
   name: string;
 }
 
+
+
 // Get website data from S3
 export async function getWebsitesFromS3(
     bucket: string,

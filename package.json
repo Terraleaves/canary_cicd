@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest",
+    "test": "node --max-old-space-size=4096 node_modules/.bin/jest",
     "cdk": "cdk"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
   "dependencies": {
     "@aws-sdk/client-cloudwatch": "^3.658.0",
     "@aws-sdk/client-dynamodb": "^3.658.0",
-    "@aws-sdk/client-s3": "^3.658.0",
+    "@aws-sdk/client-s3": "^3.662.0",
     "@aws-sdk/client-secrets-manager": "^3.658.1",
     "@aws-sdk/lib-dynamodb": "^3.658.0",
     "aws-cdk-lib": "2.151.0",
