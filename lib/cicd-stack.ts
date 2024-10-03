@@ -57,21 +57,6 @@ export class CicdStack extends cdk.Stack {
     // Add approve step to proceed production deployment
     uatStage.addPost(new ManualApprovalStep("approval"));
 
-    // Validation stage
-    const validationStage = pipeline.addStage(new MyPipelineAppStage(this, "Validation", {
-      env: {
-        account: "325861338157",
-        region: "ap-southeast-2",
-      },
-    }));
-
-    validationStage.addPost(new ShellStep("Validate", {
-      commands: [
-        "echo 'Running validation checks...'",
-        "npm run validate", // Replace with your validation command
-      ],
-    }));
-
     // Define deploy stage
     // Can be used to deploy multi regions
     const deployStage = pipeline.addStage(
@@ -89,8 +74,8 @@ export class CicdStack extends cdk.Stack {
         // Log message for rollback
         'echo "Rolling back..."',
 
-         // Command to rollback (replace with your actual stack name)
-        'aws cloudformation rollback-stack --stack-name your-stack-name'
+         // Command to rollback
+        'aws cloudformation rollback-stack --stack-name DevOpsStack'
       ],
     }));
   }
