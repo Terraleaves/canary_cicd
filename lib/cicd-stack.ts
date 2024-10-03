@@ -7,7 +7,6 @@ import {
   ManualApprovalStep,
 } from "aws-cdk-lib/pipelines";
 import { MyPipelineAppStage } from "./pipeline-app-stage";
-import { DevOpsStack } from './devops-stack';
 
 export class CicdStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -32,45 +31,8 @@ export class CicdStack extends cdk.Stack {
     // Create cicd pipeline
     const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "DevOpsPipeline",
-      synth: synthStep,
-      crossAccountKeys: true
+      synth: synthStep
     });
-
-    const uat = new MyPipelineAppStage(this, "Stage", {
-      env: {
-        account: "325861338157",
-        region: "ap-southeast-2",
-      },
-    })
-
-    // Add validation
-    const uatStage = pipeline.addStage(uat, {
-      post: [
-        new ShellStep('Validation', {
-          commands: [
-            'curl -Ssf $ENDPOINT_URL'
-          ],
-          envFromCfnOutputs: {
-            ENDPOINT_URL: uat.urlOutput
-          }
-        })
-      ]
-    }
-
-    );
-
-    // Add Testing step
-    uatStage.addPre(
-      new ShellStep("Test", {
-        commands: [
-          "npm ci",
-          "node --max-old-space-size=4096 node_modules/.bin/jest",
-        ],
-      })
-    );
-
-    // Add approve step to proceed production deployment
-    uatStage.addPost(new ManualApprovalStep("approval"));
 
     // Define deploy stage
     // Can be used to deploy multi regions
@@ -83,15 +45,16 @@ export class CicdStack extends cdk.Stack {
       })
     );
 
-    // Automatically rollback if deployment fails
-    deployStage.addPost(new ShellStep("Rollback", {
-      commands: [
-        // Log message for rollback
-        'echo "Rolling back..."',
+    deployStage.addPre(
+      new ShellStep("Test", {
+        commands: [
+          "npm ci",
+          "node --max-old-space-size=4096 node_modules/.bin/jest",
+        ],
+      })
+    );
 
-         // Command to rollback
-        'aws cloudformation rollback-stack --stack-name DevOpsStack'
-      ],
-    }));
+    // Add approve step to proceed production deployment
+    deployStage.addPre(new ManualApprovalStep("approval"));
   }
 }
