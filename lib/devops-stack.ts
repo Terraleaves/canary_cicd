@@ -11,6 +11,7 @@ import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 
 export class DevOpsStack extends cdk.Stack {
+  public readonly urlOutput: cdk.CfnOutput;
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
     // 1. Create an SNS Topic and add email subscription to the SNS topic
@@ -34,6 +35,15 @@ export class DevOpsStack extends cdk.Stack {
 
     // 6. Create event rule of lambda execution
     this.createEventRule(canaryFunction);
+
+    // Create function to output url in console
+    const canaryFunctionUrl = canaryFunction.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+    });
+
+    this.urlOutput = new cdk.CfnOutput(this, "myFunctionUrlOutput", {
+      value: canaryFunctionUrl.url,
+    });
   }
 
 
