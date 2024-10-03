@@ -67,5 +67,16 @@ export class CicdStack extends cdk.Stack {
         },
       })
     );
+
+    // Automatically rollback if deployment fails
+    deployStage.addPost(new ShellStep("Rollback", {
+      commands: [
+        // Log message for rollback
+        'echo "Rolling back..."',
+
+         // Command to rollback (replace with your actual stack name)
+        'aws cloudformation rollback-stack --stack-name your-stack-name'
+      ],
+    }));
   }
 }
