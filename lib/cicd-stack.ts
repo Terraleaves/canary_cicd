@@ -40,7 +40,7 @@ export class CicdStack extends cdk.Stack {
       new MyPipelineAppStage(this, "Deploy", {
         env: {
           account: "325861338157",
-          region: "us-west-2",
+          region: "ap-southeast-2",
         },
       })
     );
