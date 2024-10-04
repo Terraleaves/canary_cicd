@@ -32,13 +32,8 @@ export class DevOpsStack extends cdk.Stack {
     // 5. Provide permission to canary
     this.grantPermissions(canaryFunction, dynammoDBTable);
 
-    // 6. Create event rule of lambda execution
-    this.createEventRule(canaryFunction);
 
-    // Create function to output url in console
-    const canaryFunctionUrl = canaryFunction.addFunctionUrl({
-      authType: lambda.FunctionUrlAuthType.NONE,
-    });
+
   }
 
 
@@ -98,6 +93,13 @@ export class DevOpsStack extends cdk.Stack {
         CW_DASHBOARD_NAME: dashboard.dashboardName,
       },
     });
+    // Invoke canary function evenry minute
+    const rule = new events.Rule(this, "CanaryFuncitonScheduleRule", {
+      schedule: events.Schedule.rate(cdk.Duration.minutes(1)),
+    });
+
+    // Add rule to canary function
+    rule.addTarget(new targets.LambdaFunction(canaryFunction));
 
     return canaryFunction;
   }
@@ -115,14 +117,4 @@ export class DevOpsStack extends cdk.Stack {
     table.grantWriteData(canaryFunction);
   }
 
-  // Create event rule of lambda execution
-  private createEventRule(canaryFunction: lambda.Function): void {
-    // Invoke canary function evenry minute
-    const rule = new events.Rule(this, "CanaryFuncitonScheduleRule", {
-      schedule: events.Schedule.rate(cdk.Duration.minutes(1)),
-    });
-
-    // Add rule to canary function
-    rule.addTarget(new targets.LambdaFunction(canaryFunction));
-  }
 }
