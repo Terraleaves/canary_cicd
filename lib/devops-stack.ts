@@ -29,14 +29,12 @@ export class DevOpsStack extends cdk.Stack {
       dynammoDBTable
     );
 
-    // 5. Provide permission to canary
+    // 5. Create another function for rollback if memory usage is more than threshold
+    this.lambdaMemoryAlarmFunction(canaryFunction);
+
+    // 6. Provide permission to canary
     this.grantPermissions(canaryFunction, dynammoDBTable);
-
-
-
   }
-
-
 
   // Create an SNS Topic and add email subscription to the SNS topic
   private createSNSTopic(): sns.Topic {
@@ -117,4 +115,42 @@ export class DevOpsStack extends cdk.Stack {
     table.grantWriteData(canaryFunction);
   }
 
+  // Memory usage alarm
+  private lambdaMemoryAlarmFunction(canaryFunction: lambda.Function) {
+    // SNS Topic to notify and trigger rollback
+    const rollbackTopic = new sns.Topic(this, "LambdaMemoryAlarmTopic");
+
+    // Momory threshold 512 MB
+    const MEMORY_THRESHOLD = 512 * 1024 * 1024;
+
+    // Create alarm in cloudwatch dashboard to monitor Lambda memory usage
+    const alarm = new cloudwatchDashboards.Alarm(this, "LambdaMemoryAlarm", {
+      metric: canaryFunction.metric("MaxMemoryUsed"),
+      threshold: MEMORY_THRESHOLD, // 512 MB
+      evaluationPeriods: 1,
+      comparisonOperator:
+        cloudwatchDashboards.ComparisonOperator.GREATER_THAN_THRESHOLD,
+    });
+
+    // Add SNS action to alarm
+    alarm.addAlarmAction({
+      bind() {
+        return { alarmActionArn: rollbackTopic.topicArn };
+      },
+    });
+
+    // Add rollback lambda function as an SNS subscription
+    const rollbackLambda = new lambda.Function(this, "RollbackLambdaFunction", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: "rollback.handler",
+      code: lambda.Code.fromAsset("lambda-rollback"), // Rollback logic
+      environment: {
+        CANARY_FUNCTION_NAME: canaryFunction.functionName,
+      },
+    });
+
+    rollbackTopic.addSubscription(
+      new snsSubscriptions.LambdaSubscription(rollbackLambda)
+    );
+  }
 }
