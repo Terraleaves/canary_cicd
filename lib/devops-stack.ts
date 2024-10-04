@@ -30,10 +30,13 @@ export class DevOpsStack extends cdk.Stack {
     );
 
     // 5. Create another function for rollback if memory usage is more than threshold
-    this.lambdaMemoryAlarmFunction(canaryFunction);
+    const rollbackFunction = this.lambdaMemoryAlarmFunction(canaryFunction);
 
-    // 6. Provide permission to canary
+    // 6. Provide permission to canary function
     this.grantPermissions(canaryFunction, dynammoDBTable);
+
+    // 7. Provide permissiont to rollback function
+    this.grantPermissions(rollbackFunction);
   }
 
   // Create an SNS Topic and add email subscription to the SNS topic
@@ -104,7 +107,7 @@ export class DevOpsStack extends cdk.Stack {
 
   private grantPermissions(
     canaryFunction: lambda.Function,
-    table: dynamodb.Table
+    table?: dynamodb.Table
   ): void {
     // Add admin access to do everything
     canaryFunction.role?.addManagedPolicy(
@@ -112,7 +115,7 @@ export class DevOpsStack extends cdk.Stack {
     );
 
     // Grant write access to DynamoDB
-    table.grantWriteData(canaryFunction);
+    if (table) table.grantWriteData(canaryFunction);
   }
 
   // Memory usage alarm
@@ -152,5 +155,7 @@ export class DevOpsStack extends cdk.Stack {
     rollbackTopic.addSubscription(
       new snsSubscriptions.LambdaSubscription(rollbackLambda)
     );
+
+    return rollbackLambda;
   }
 }
