@@ -41,6 +41,7 @@ export class DevOpsStack extends cdk.Stack {
       authType: lambda.FunctionUrlAuthType.NONE,
     });
 
+    // Optional: output url
     this.urlOutput = new cdk.CfnOutput(this, "myFunctionUrlOutput", {
       value: canaryFunctionUrl.url,
     });
