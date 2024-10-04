@@ -143,7 +143,7 @@ export class DevOpsStack extends cdk.Stack {
     const rollbackLambda = new lambda.Function(this, "RollbackLambdaFunction", {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "rollback.handler",
-      code: lambda.Code.fromAsset("lambda-rollback"), // Rollback logic
+      code: lambda.Code.fromAsset(path.join(__dirname, "../function")), // Rollback logic
       environment: {
         CANARY_FUNCTION_NAME: canaryFunction.functionName,
       },
