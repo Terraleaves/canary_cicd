@@ -9,6 +9,7 @@ import * as cloudwatchDashboards from "aws-cdk-lib/aws-cloudwatch";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
+import * as codedeploy from "aws-cdk-lib/aws-codedeploy";
 
 export class DevOpsStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -29,14 +30,11 @@ export class DevOpsStack extends cdk.Stack {
       dynammoDBTable
     );
 
-    // 5. Create another function for rollback if memory usage is more than threshold
-    const rollbackFunction = this.lambdaMemoryAlarmFunction(canaryFunction);
+    // 5. Create rollback of memory usage is more than threshold
+    this.rollbackLambda(canaryFunction);
 
     // 6. Provide permission to canary function
     this.grantPermissions(canaryFunction, dynammoDBTable);
-
-    // 7. Provide permissiont to rollback function
-    this.grantPermissions(rollbackFunction);
   }
 
   // Create an SNS Topic and add email subscription to the SNS topic
@@ -119,43 +117,34 @@ export class DevOpsStack extends cdk.Stack {
   }
 
   // Memory usage alarm
-  private lambdaMemoryAlarmFunction(canaryFunction: lambda.Function) {
-    // SNS Topic to notify and trigger rollback
-    const rollbackTopic = new sns.Topic(this, "LambdaMemoryAlarmTopic");
-
-    // Momory threshold 512 MB
-    const MEMORY_THRESHOLD = 512 * 1024 * 1024;
-
+  private rollbackLambda(canaryFunction: lambda.Function) {
     // Create alarm in cloudwatch dashboard to monitor Lambda memory usage
-    const alarm = new cloudwatchDashboards.Alarm(this, "LambdaMemoryAlarm", {
-      metric: canaryFunction.metric("MaxMemoryUsed"),
-      threshold: MEMORY_THRESHOLD, // 512 MB
+    const memoryAlarm = new cloudwatchDashboards.Alarm(this, "LambdaMemoryAlarm", {
+      metric: canaryFunction.metric("MemoryUtilization"),
+      threshold: 80, // 512 MB
       evaluationPeriods: 1,
       comparisonOperator:
-        cloudwatchDashboards.ComparisonOperator.GREATER_THAN_THRESHOLD,
+        cloudwatchDashboards.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
 
-    // Add SNS action to alarm
-    alarm.addAlarmAction({
-      bind() {
-        return { alarmActionArn: rollbackTopic.topicArn };
-      },
+    // Create Lambda Alias (required for CodeDeploy)
+    const lambdaAlias = new lambda.Alias(this, "LambdaAlias", {
+      aliasName: "Prod",
+      version: canaryFunction.currentVersion,
     });
 
-    // Add rollback lambda function as an SNS subscription
-    const rollbackLambda = new lambda.Function(this, "RollbackLambdaFunction", {
-      runtime: lambda.Runtime.NODEJS_20_X,
-      handler: "rollback.handler",
-      code: lambda.Code.fromAsset(path.join(__dirname, "../function")), // Rollback logic
-      environment: {
-        CANARY_FUNCTION_NAME: canaryFunction.functionName,
-      },
+    // Define Lambda deployment configuration in CodeDeploy (with automatic rollback on failure)
+    const deploymentGroup = new codedeploy.LambdaDeploymentGroup(this, "DevOpsDeploymentGroup", {
+      // Use the Lambda alias
+      alias: lambdaAlias,
+
+      deploymentConfig: codedeploy.LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES, // Deployment strategy (10% for every 5 mins)
+
+      // Rollback if the CloudWatch Alarm triggers
+      alarms: [memoryAlarm],
     });
 
-    rollbackTopic.addSubscription(
-      new snsSubscriptions.LambdaSubscription(rollbackLambda)
-    );
-
-    return rollbackLambda;
+    // Trigger the alarm to roll back the lambda deployment if memory exceeds threshold
+    deploymentGroup.addAlarm(memoryAlarm);
   }
 }
