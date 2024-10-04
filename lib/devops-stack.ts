@@ -116,7 +116,7 @@ export class DevOpsStack extends cdk.Stack {
     if (table) table.grantWriteData(canaryFunction);
   }
 
-  // Memory usage alarm
+  // Rollback of Memory usage
   private rollbackLambda(canaryFunction: lambda.Function) {
     // Create alarm in cloudwatch dashboard to monitor Lambda memory usage
     const memoryAlarm = new cloudwatchDashboards.Alarm(this, "LambdaMemoryAlarm", {
