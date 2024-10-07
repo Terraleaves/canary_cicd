@@ -86,7 +86,6 @@ export class DevOpsStack extends cdk.Stack {
       handler: "index.handler",
       code: lambda.Code.fromAsset(path.join(__dirname, "../function")),
       timeout: cdk.Duration.seconds(60),
-      memorySize: 512,
       environment: {
         TOPIC_ARN: alarmTopic.topicArn,
         DB_TABLE: table.tableName,
