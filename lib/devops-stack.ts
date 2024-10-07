@@ -143,8 +143,5 @@ export class DevOpsStack extends cdk.Stack {
       // Rollback if the CloudWatch Alarm triggers
       alarms: [memoryAlarm],
     });
-
-    // Trigger the alarm to roll back the lambda deployment if memory exceeds threshold
-    deploymentGroup.addAlarm(memoryAlarm);
   }
 }
