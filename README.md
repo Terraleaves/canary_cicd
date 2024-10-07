@@ -27,15 +27,15 @@ Canary Lambda function sends log to dynamoDB table called DevOpsAlarmLog
 
 ## CICD Stack
 1. **GitHUb Integration**
-Connects to a GitHub repository using CodeStar Connections
+   Connects to a GitHub repository using CodeStar Connections
 2. **CodePipeline**
-Creates a CI/CD pipeline that fetches the source code, builds the application, and deploys it
+   Creates a CI/CD pipeline that fetches the source code, builds the application, and deploys it
 3. **Shell Steps**
-Build and test Runs tests on the application
+   Build and test Runs tests on the application
 4. **Multi-Region Deployment**
-The pipelien can be configured to deploy to multiple AWS regions
+   The pipelien can be configured to deploy to multiple AWS regions
 5. **Manual Approval**
-Provides a manual approval step before deploying to the production environment
+   Provides a manual approval step before deploying to the production environment
 
 
 ## Prerequisites
