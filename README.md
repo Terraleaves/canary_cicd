@@ -3,38 +3,42 @@ This project defines a CDK stack for application and CICD for automating the dep
 The pipeline integrates with GitHub for source control, builds the application, and deploys to a specified environment, with a manual approaval step before production deployment.
 
 ## DevOps Stack
-1. **SNS Topic and Email Subscription**
+### **SNS Topic and Email Subscription**
 - Create and SNS topic that will send notification when Cloudwatch alarms are triggered.
 - Adds an email subscription to this topic, currently notifications are sent to 'kiyohiro.0310@gmail.com'
 
-2. **CloudWatch Dashboard**
+### **CloudWatch Dashboard**
 - Creates a CloudWatch dashboard to display and monitor availability and latency metrics for three websites. Currently, we have the following
   - https://kiyo31.com
   - https://google.com
   - https://youtube.com
 
-3. **DynamoDB Table**
+### **DynamoDB Table**
 - Create a DynamoDB table named with two keys:
   - websiteName (Partition key)
   - timestamp (Sort Key)
 Canary Lambda function sends log to dynamoDB table called DevOpsAlarmLog
 
-4. **Canary Lambda Function**
+### **Canary Lambda Function**
 - Checks three websites and sends availability and latency to CloudWatch Dashboard
 - Send log alarm to user
 - Store log to dynamoDB table called DevOpsAlarmLog
 
 
 ## CICD Stack
-1. **GitHUb Integration**
+### **GitHUb Integration**
 Connects to a GitHub repository using CodeStar Connections
-2. **CodePipeline**
+
+### **CodePipeline**
 Creates a CI/CD pipeline that fetches the source code, builds the application, and deploys it
-3. **Shell Steps**
+
+### **Shell Steps**
 Build and test Runs tests on the application
-4. **Multi-Region Deployment**
+
+### **Multi-Region Deployment**
 The pipelien can be configured to deploy to multiple AWS regions
-5. **Manual Approval**
+
+### **Manual Approval**
 Provides a manual approval step before deploying to the production environment
 
 
