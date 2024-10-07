@@ -39,7 +39,7 @@ Canary Lambda function sends log to dynamoDB table called DevOpsAlarmLog
 
 
 ## System Architecture
-![alt text](https://res.cloudinary.com/dtbk6m3ig/image/upload/v1728302466/DevOps_WSU_5_wf8oet.png)
+![alt text](https://res.cloudinary.com/dtbk6m3ig/image/upload/v1728302568/DevOps_WSU_6_dmfiij.png)
 
 ## Prerequisites
 To manage and deploy this stac, you will need the following:
