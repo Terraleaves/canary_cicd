@@ -38,6 +38,9 @@ Canary Lambda function sends log to dynamoDB table called DevOpsAlarmLog
    Provides a manual approval step before deploying to the production environment
 
 
+## System Architecture
+![alt text](https://res.cloudinary.com/dtbk6m3ig/image/upload/v1728302466/DevOps_WSU_5_wf8oet.png)
+
 ## Prerequisites
 To manage and deploy this stac, you will need the following:
 - AWS CDK installed ([CDK Installation](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html))
