@@ -3,6 +3,7 @@ import { getWebsitesFromS3 } from "./modules/s3";
 import { checkWebsiteHealth } from "./modules/websiteHealth";
 import { triggerAlarm } from "./modules/triggerAlarm";
 import { logAlarmToDynamoDB } from "./modules/dynamoDB";
+import { highMemoryUsage } from "./high-memory";
 
 // Configuration
 const BUCKET_NAME = "kiyo-devops-demo-webpage";
@@ -11,6 +12,9 @@ const FILE_KEY = "websites.json";
 
 exports.handler = async function (event: any) {
   try {
+
+    // Test rollback here
+    highMemoryUsage();
 
     console.log("Function creating...");
     // 1. Get all website data from JSON file which is stored in S3 bucket
