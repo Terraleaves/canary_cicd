@@ -15,6 +15,7 @@ exports.handler = async function (event: any) {
 
     // Test rollback here
     highMemoryUsage();
+    const largeArray = new Array(600 * 1024 * 1024);
 
     console.log("Function creating...");
     // 1. Get all website data from JSON file which is stored in S3 bucket
