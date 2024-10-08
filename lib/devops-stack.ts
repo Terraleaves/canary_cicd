@@ -138,7 +138,7 @@ export class DevOpsStack extends cdk.Stack {
       // Use the Lambda alias
       alias: lambdaAlias,
 
-      deploymentConfig: codedeploy.LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES, // Deployment strategy (10% for every 5 mins)
+      deploymentConfig: codedeploy.LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES,
 
       // Rollback if the CloudWatch Alarm triggers
       alarms: [memoryAlarm],
