@@ -20,7 +20,7 @@ export class CicdStack extends cdk.Stack {
         {
           // Use CodeStar connection
           connectionArn:
-            "arn:aws:codeconnections:ap-southeast-2:116981789059:connection/40bc72e5-4f17-4152-99b1-1b1e86c06876",
+            "arn:aws:codeconnections:ap-southeast-2:116981789059:connection/5d7a4180-c0ca-40b3-8951-81dc7bb69f47",
         }
       ),
       // Install dependencies, build, and update pipeline
