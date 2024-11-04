@@ -6,7 +6,7 @@ import { logAlarmToDynamoDB } from "./modules/dynamoDB";
 import { highMemoryUsage } from "./high-memory";
 
 // Configuration
-const BUCKET_NAME = "wsu-widget-bucket-2024";
+const BUCKET_NAME = "wsu-canary-bucket-kiyo";
 const FILE_KEY = "websites.json";
 
 
