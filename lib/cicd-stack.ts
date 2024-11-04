@@ -15,7 +15,7 @@ export class CicdStack extends cdk.Stack {
     // Define shell step to fetch source
     const synthStep = new ShellStep("Synth", {
       input: CodePipelineSource.connection(
-        "kiyohiro0310/devops_cicd",
+        "Terraleaves/canary_cdk",
         "master",
         {
           // Use CodeStar connection
