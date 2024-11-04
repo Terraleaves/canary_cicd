@@ -39,7 +39,7 @@ export class CicdStack extends cdk.Stack {
     const deployStage = pipeline.addStage(
       new MyPipelineAppStage(this, "Deploy", {
         env: {
-          account: "325861338157",
+          account: "116981789059",
           region: "ap-southeast-2",
         },
       })
