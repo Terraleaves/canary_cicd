@@ -49,7 +49,7 @@ export class CicdStack extends cdk.Stack {
       new ShellStep("Test", {
         commands: [
           "npm ci",
-          "node test",
+          "npm test",
         ],
       })
     );
